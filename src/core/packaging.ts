@@ -98,24 +98,50 @@ RestartSec=3
 WantedBy=plasma-workspace.target graphical-session.target
 `;
 
-export const ARCH_INSTALL_INSTRUCTIONS = `# Installing Ghostly on Arch Linux
+export const ARCH_INSTALL_INSTRUCTIONS = `# ==============================================================================
+# HƯỚNG DẪN CÀI ĐẶT GHOSTLY NHƯ MỘT ỨNG DỤNG MẶC ĐỊNH TRÊN HỆ THỐNG
+# ==============================================================================
 
-# 1. Install prerequisites using pacman:
-sudo pacman -S --needed base-devel git cmake ninja qt6-base qt6-declarative qt6-wayland playerctl lm_sensors
+# --- CÁCH 1: CÀI ĐẶT NATIVE APP BẰNG PKGBUILD (DÀNH CHO ARCH LINUX / KDE PLASMA) ---
+# 1. Cài các package cần thiết:
+sudo pacman -S --needed base-devel git cmake ninja qt6-base qt6-declarative qt6-wayland kwayland playerctl lm_sensors
 
-# 2. Build and install via PKGBUILD:
-git clone https://aur.archlinux.org/ghostly-bin.git /tmp/ghostly
-cd /tmp/ghostly
+# 2. Tải mã nguồn hoặc lấy file PKGBUILD từ tab PKGBUILD:
+mkdir -p ~/builds/ghostly && cd ~/builds/ghostly
+# (Lưu file PKGBUILD vào thư mục này)
+
+# 3. Biên dịch và cài đặt trực tiếp vào hệ thống:
 makepkg -si
 
-# 3. Or install via your favorite AUR helper (paru / yay):
-yay -S ghostly
-# or
-paru -S ghostly
-
-# 4. Start Ghostly:
-ghostly &
-
-# Enable systemd user service for autostart with KDE Plasma:
+# 4. Kích hoạt tự khởi động cùng phiên KDE Plasma (XDG Autostart / systemd):
 systemctl --user enable --now ghostly.service
+
+
+# --- CÁCH 2: CHẠY NHƯ ỨNG DỤNG STANDALONE DESKTOP (ĐỘC LẬP KHÔNG CẦN BROWSER CHÍNH) ---
+# 1. Chạy Ghostly local server:
+npm install && npm run build
+npm run preview -- --port 3000
+
+# 2. Tạo file Desktop Launcher (/usr/share/applications/ghostly.desktop hoặc ~/.local/share/applications/ghostly.desktop):
+cat << 'EOF' > ~/.local/share/applications/ghostly.desktop
+[Desktop Entry]
+Name=Ghostly
+Comment=Adaptive Dynamic Island Desktop Companion
+Exec=chromium --app=http://localhost:3000 --class=ghostly-island --window-size=500,120
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=Utility;KDE;Qt;
+StartupWMClass=ghostly-island
+EOF
+
+# 3. Cập nhật cơ sở dữ liệu ứng dụng của hệ thống:
+update-desktop-database ~/.local/share/applications/
+
+
+# --- CÁCH 3: CÀI ĐẶT 1-CLICK DẠNG PWA TỪ TRÌNH DUYỆT VÀO HỆ THỐNG ---
+# 1. Mở Ghostly trên Chrome, Chromium hoặc Brave.
+# 2. Nhấp vào icon "Cài đặt ứng dụng" (Install Ghostly) ở thanh địa chỉ URL.
+# 3. Ghostly sẽ được thêm trực tiếp vào Application Launcher (KDE Kickoff / Start Menu)
+#    và chạy như 1 cửa sổ ứng dụng riêng biệt, không có thanh tab hay viền trình duyệt.
 `;

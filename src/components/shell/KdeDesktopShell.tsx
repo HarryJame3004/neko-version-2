@@ -156,6 +156,21 @@ export const KdeDesktopShell: React.FC<KdeDesktopShellProps> = ({
             </div>
           </div>
 
+          {/* Auto-Fade Idle Inactivity Toggle */}
+          <div className="pt-1 border-t border-white/10 flex items-center justify-between">
+            <span className="text-[11px] text-slate-300">Tự làm mờ khi rảnh (Idle):</span>
+            <button
+              onClick={() => onUpdateConfig({ ...config, autoFadeIdle: !config.autoFadeIdle })}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium transition-colors ${
+                config.autoFadeIdle
+                  ? 'bg-blue-500/20 text-blue-300 border border-blue-400/40'
+                  : 'bg-white/5 text-slate-400 border border-white/10'
+              }`}
+            >
+              {config.autoFadeIdle ? `BẬT (${config.idleTimeoutSeconds}s)` : 'TẮT'}
+            </button>
+          </div>
+
           {/* Fractional Scaling Selector (Section 31) */}
           <div>
             <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block mb-1">

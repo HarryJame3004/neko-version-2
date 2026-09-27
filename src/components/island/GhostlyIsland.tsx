@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   IslandLevel,
   ActiveTab,
@@ -55,6 +55,44 @@ export const GhostlyIsland: React.FC<GhostlyIslandProps> = ({
   const [activeTab, setActiveTab] = useState<ActiveTab>('media');
   const [isHovered, setIsHovered] = useState(false);
   const [expression, setExpression] = useState<EyeExpression>('neutral');
+  const [isIdleFaded, setIsIdleFaded] = useState(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Inactivity / Idle Auto-Fade Engine
+  const resetIdleTimer = useCallback(() => {
+    setIsIdleFaded(false);
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+    }
+
+    // Only auto-fade in compact mode (Level 1 & 2) when user is not hovering and autoFadeIdle is enabled
+    if (config.autoFadeIdle && currentLevel <= 2 && !isHovered) {
+      idleTimerRef.current = setTimeout(() => {
+        setIsIdleFaded(true);
+      }, (config.idleTimeoutSeconds || 6) * 1000);
+    }
+  }, [config.autoFadeIdle, config.idleTimeoutSeconds, currentLevel, isHovered]);
+
+  useEffect(() => {
+    resetIdleTimer();
+
+    const handleUserActivity = () => {
+      resetIdleTimer();
+    };
+
+    window.addEventListener('mousemove', handleUserActivity, { passive: true });
+    window.addEventListener('keydown', handleUserActivity, { passive: true });
+    window.addEventListener('touchstart', handleUserActivity, { passive: true });
+    window.addEventListener('mousedown', handleUserActivity, { passive: true });
+
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      window.removeEventListener('touchstart', handleUserActivity);
+      window.removeEventListener('mousedown', handleUserActivity);
+    };
+  }, [resetIdleTimer]);
 
   // Dragging support for floating free mode
   const [isDragging, setIsDragging] = useState(false);
@@ -169,21 +207,31 @@ export const GhostlyIsland: React.FC<GhostlyIslandProps> = ({
 
   return (
     <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        setIsIdleFaded(false);
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        resetIdleTimer();
+      }}
       onMouseDown={handleMouseDown}
-      className={`relative transition-all duration-300 ease-out border backdrop-blur-md overflow-hidden ${themeBg} ${getRadiusClass()}`}
+      className={`relative transition-all duration-500 ease-out border backdrop-blur-md overflow-hidden ${themeBg} ${getRadiusClass()} ${
+        isIdleFaded ? 'opacity-35 scale-95 hover:opacity-100 hover:scale-100' : 'opacity-100 scale-100'
+      }`}
       style={{
-        backdropFilter: `blur(${config.blurAmount}px)`,
+        backdropFilter: `blur(${isIdleFaded ? 8 : config.blurAmount}px)`,
         backgroundColor:
           config.theme === 'amoled'
-            ? `rgba(0, 0, 0, ${config.bgOpacity})`
+            ? `rgba(0, 0, 0, ${isIdleFaded ? config.idleDimOpacity : config.bgOpacity})`
             : config.theme === 'breeze'
-            ? `rgba(27, 34, 44, ${config.bgOpacity})`
-            : `rgba(15, 23, 42, ${config.bgOpacity})`,
+            ? `rgba(27, 34, 44, ${isIdleFaded ? config.idleDimOpacity : config.bgOpacity})`
+            : `rgba(15, 23, 42, ${isIdleFaded ? config.idleDimOpacity : config.bgOpacity})`,
         boxShadow:
           currentLevel >= 4
             ? '0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+            : isIdleFaded
+            ? '0 2px 8px -2px rgba(0, 0, 0, 0.4)'
             : '0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08)',
         cursor: isDragging ? 'grabbing' : 'default',
       }}

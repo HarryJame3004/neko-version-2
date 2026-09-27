@@ -108,4 +108,7 @@ export interface GhostlyConfig {
   autostart: boolean;
   soundEffects: boolean;
   debugMode: boolean;
+  autoFadeIdle: boolean; // whether to automatically fade/dim when inactive
+  idleTimeoutSeconds: number; // seconds before fading (e.g. 5s, 10s, 30s)
+  idleDimOpacity: number; // opacity when faded (e.g. 0.25 to 0.45)
 }

@@ -25,6 +25,9 @@ export const DEFAULT_CONFIG: GhostlyConfig = {
   autostart: true,
   soundEffects: true,
   debugMode: false,
+  autoFadeIdle: true,
+  idleTimeoutSeconds: 6,
+  idleDimOpacity: 0.35,
 };
 
 const STORAGE_KEY = 'ghostly_config_v1';
@@ -71,6 +74,9 @@ fullscreen_behavior = "${config.fullscreenBehavior}"
 autostart = ${config.autostart}
 sound_effects = ${config.soundEffects}
 debug = ${config.debugMode}
+auto_fade_idle = ${config.autoFadeIdle}
+idle_timeout_seconds = ${config.idleTimeoutSeconds}
+idle_dim_opacity = ${config.idleDimOpacity}
 
 [modules]
 eyes = ${config.enabledModules.eyes}

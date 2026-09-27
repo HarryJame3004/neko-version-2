@@ -220,6 +220,58 @@ export const LevelWorkspace: React.FC<LevelWorkspaceProps> = ({
                     className="w-full h-1 bg-white/20 rounded-lg cursor-pointer"
                   />
                 </div>
+
+                {/* Auto Fade Idle when Inactive */}
+                <div className="pt-2 border-t border-white/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-white font-medium block">Auto-Dim on Inactivity</span>
+                      <span className="text-[10px] text-slate-400">Tự làm mờ khi không chạm lâu</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.autoFadeIdle}
+                      onChange={(e) => onUpdateConfig({ ...config, autoFadeIdle: e.target.checked })}
+                      className="rounded accent-blue-500 w-4 h-4 cursor-pointer"
+                    />
+                  </div>
+
+                  {config.autoFadeIdle && (
+                    <>
+                      <div>
+                        <div className="flex justify-between text-[11px] text-slate-400 mb-0.5">
+                          <span>Idle Timeout (Thời gian chờ)</span>
+                          <span className="font-mono text-blue-300">{config.idleTimeoutSeconds}s</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={3}
+                          max={30}
+                          step={1}
+                          value={config.idleTimeoutSeconds}
+                          onChange={(e) => onUpdateConfig({ ...config, idleTimeoutSeconds: Number(e.target.value) })}
+                          className="w-full h-1 bg-white/20 rounded-lg cursor-pointer accent-blue-400"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-[11px] text-slate-400 mb-0.5">
+                          <span>Dim Opacity (Độ mờ)</span>
+                          <span className="font-mono text-blue-300">{Math.round((config.idleDimOpacity || 0.35) * 100)}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0.15}
+                          max={0.65}
+                          step={0.05}
+                          value={config.idleDimOpacity || 0.35}
+                          onChange={(e) => onUpdateConfig({ ...config, idleDimOpacity: Number(e.target.value) })}
+                          className="w-full h-1 bg-white/20 rounded-lg cursor-pointer accent-blue-400"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Linux & Wayland Environment */}
