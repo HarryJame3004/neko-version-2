@@ -1,0 +1,6 @@
+{
+  "name": "Ghostly - Adaptive Dynamic Island Desktop Companion",
+  "description": "An adaptive Dynamic Island desktop companion with expressive mouse-tracking eyes, MPRIS media control, Linux system monitor, and KDE Plasma integration for Arch Linux.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
